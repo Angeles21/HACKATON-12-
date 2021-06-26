@@ -1,90 +1,116 @@
-/* --- Initial class --- */
+/// --- Class container  --- ///
 class cart {
-	constructor(img, title, price, id, quantity) {
-		this.img = img;
-		this.title = title;
+	/* Requested items */
+	constructor(image, price, title, id) {
+		this.image = image;
 		this.price = price;
+		this.title = title;
 		this.id = id;
-		this.quantity = quantity;
 	}
 
-	dataEntry(item, id) {
+	constructElement() {
+		/* --- */
+		const tr = document.createElement("tr");
+		const td1 = document.createElement("td");
+		const img1 = document.createElement("img");
+		const td2 = document.createElement("td");
+		const td3 = document.createElement("td");
+		const td4 = document.createElement("td");
+		const i4 = document.createElement("i");
+		const a4 = document.createElement("a");
+		/*---*/
+
+		img1.src = this.image;
+		td1.appendChild(img1);
+		td2.textContent = this.title;
+		td3.textContent = this.price;
+		a4.setAttribute("onClick", "deleteItemID(" + this.id + ")");
+		i4.setAttribute("class", "fas fa-trash-alt");
+		a4.appendChild(i4);
+		td4.appendChild(a4);
+		tr.setAttribute("id", this.id);
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		tr.appendChild(td3);
+		tr.appendChild(td4);
+
+		/* Location */
+
+		const container = document.querySelector("tbody");
+		container.appendChild(tr);
+		this.getInfoItem();
+	}
+
+	/* Product Information */
+
+	getInfoItem() {
 		const infoItem = {
-			image: item.querySelector("img").src,
-			title: item.querySelector("h2").textContent,
-			price: item.querySelector(".value").textContent,
-			id,
-			quantity: 1,
+			image: this.image,
+			price: this.price,
+			title: this.title,
+			id: this.id,
 		};
-
-		newItems = [...newItems, infoItem];
-		document.getElementById("counter").textContent = `${newItems.length}`;
-	}
-
-	keepIn(items) {
-		const purchase = document.createElement("tr");
-		items.forEach((item) => {
-			purchase.innerHTML = `
-            <td>
-                <img src= "${item.image}" style = "width: 100%;"/>
-            </td>
-            <td> "${item.title}"</td>
-            <td> "${item.quantity}" </td>
-            <td> "${item.price}" </td>
-    
-            <td>
-                <a href="#" class = "delete" data-id="${item.id}"> x </a>
-            </td>`;
+		infoItems = [...infoItems, infoItem];
+		infoItems = infoItems.filter((item, index) => {
+			return infoItems.indexOf(item) === index;
 		});
-
-		document.querySelector("#list__cart tbody").appendChild(purchase);
+		counter.textContent = infoItems.length;
+	}
+	/* Delete only one */
+	deleteItemID() {
+		var elemento = document.getElementById(this.id);
+		if (!elemento) {
+		} else {
+			elemento.remove();
+		}
+		infoItems = infoItems.filter((cd) => cd.id != this.id);
+		counter.textContent = infoItems.length;
 	}
 
-	deleteItem(e) {
-		if (e.target.classList.contains("delete")) {
-			const currentItem = e.target.parentElement.parentElement;
-			const itemId = parseInt(currentItem.querySelector("a").getAttribute("data-id"));
-			const counter = document.getElementById("counter");
-			counter.textContent = `${parseInt(counter.textContent) - 1}`;
+	deleteItemTotaly() {
+		infoItems.forEach((infoItem, index) => {
+			deleteItemID(infoItem.id);
+		});
+		counter.textContent = infoItems.length;
+	}
+}
 
-			currentItem.remove();
+/* --- APPLICATION ---  */
 
-			const removedIndex = newItems.findIndex((item) => item.id === itemId);
-			newItems.splice(removedIndex, 1);
+const father = document.getElementById("father");
+/* Empty array */
+let infoItems = [];
+const start = new cart(null, null, null, null);
 
-			console.info(itemId);
-			console.info(document.querySelector(`button[data-id="${itemId}"]`));
-			document.querySelector(`button[data-id="${itemId}"]`).removeAttribute("disabled");
+/* Finding the elements for the cart  */
+father.addEventListener("click", (e) => {
+	if (e.target.classList.contains("shopping")) {
+		purchase = e.target.parentElement.parentElement;
+		image = purchase.firstElementChild.src;
+		title = purchase.children[1].textContent;
+		price = purchase.children[3].children[1].firstElementChild.textContent;
+		id = purchase.children[4].textContent;
+
+		/* Validation  */
+
+		const idSearch = id;
+		const result = infoItems.find((infoItem) => infoItem.id === idSearch);
+		if (result) {
+			//console.log(result);
+		} else {
+			//console.log('Empty');
+			const newItem = new cart(image, price, title, id);
+			newItem.constructElement();
 		}
 	}
+});
 
-	emptyItem(e) {
-		e.preventDefault();
-		document.querySelector("#list__cart tbody").innerHTML = "";
-		document.getElementById("counter").textContent = "0";
-		newItems = [];
-	}
+function deleteItemID(id) {
+	const trash = new cart(image, price, title, id);
+	trash.deleteItemID();
 }
 
-function addItem(e) {
-	if (e.target.classList.contains("shopping")) {
-		let item = e.target.parentElement.parentElement;
-
-		/*Only once per item */
-		let button = e.target;
-		button.setAttribute("disabled", "");
-		dataEntry(item, button.getAttribute("data-id"));
-	}
-	const purchaseItem = new cart(img, title, price, id, quantity);
-	purchaseItem.addItem();
-}
-
-function deleteItem(id) {
-	const deleteItemA = new cart(img, title, price, id, quantity);
-	deleteItemA.delete();
-}
-
-function emptyItem() {
-	const deleteAll = new cart(img, title, price, id, quantity);
-	deleteAll.emptyItem();
+function deleteAll() {
+	const trashAll = new cart(image, price, title, id);
+	trashAll.deleteAll();
 }

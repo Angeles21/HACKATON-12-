@@ -109,3 +109,7 @@ td {
 	border-radius: 10px;
 	text-decoration: none;
 }
+
+tbody img {
+	width: 100%;
+}
